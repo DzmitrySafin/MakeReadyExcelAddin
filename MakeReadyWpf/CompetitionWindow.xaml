@@ -1,0 +1,174 @@
+﻿<Window x:Class="MakeReadyWpf.CompetitionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MakeReadyWpf"
+        xmlns:controls="clr-namespace:MakeReadyWpf.Controls"
+        xmlns:models="clr-namespace:MakeReadyGeneral.Models;assembly=MakeReadyGeneral"
+        xmlns:converters="clr-namespace:MakeReadyWpf.Converters"
+        xmlns:res="clr-namespace:MakeReadyWpf.Properties"
+        mc:Ignorable="d"
+        Title="Select Match"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResizeWithGrip"
+        Height="500" Width="900" MinWidth="600">
+    <Window.Background>
+        <LinearGradientBrush>
+            <GradientStop Color="DarkOliveGreen" Offset="-0.2"/>
+            <GradientStop Color="LightYellow" Offset="1.2"/>
+        </LinearGradientBrush>
+    </Window.Background>
+
+    <Window.Resources>
+        <converters:IsNullConverter x:Key="IsNullConverter"/>
+        <converters:CountryFlagConverter x:Key="CountryFlagConverter"/>
+        <converters:ListViewItemColorConverter x:Key="ListViewItemColorConverter"/>
+    </Window.Resources>
+
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" HorizontalAlignment="Stretch">
+            <GroupBox Header="" DockPanel.Dock="Right" Margin="0,0,-6,0" BorderThickness="0">
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Select" Width="80" Padding="4" IsDefault="True" Command="{Binding OkCommand}"/>
+                    <Button Content="Cancel" Width="80" Padding="4" Margin="8,0,0,0" IsCancel="True"/>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Filters" HorizontalAlignment="Stretch">
+                <DockPanel HorizontalAlignment="Stretch">
+                    <controls:CustomDatePicker Width="120" Margin="0,0,8,0" SelectedDate="{Binding DateStart}" WatermarkText=" start period"/>
+                    <controls:CustomDatePicker Width="120" SelectedDate="{Binding DateEnd}" WatermarkText=" end period"/>
+                    <Grid Margin="8,0,8,0">
+                        <ComboBox Width="150" Padding="4" IsEditable="False" SelectedValuePath="Code" SelectedValue="{Binding CountryFilter}" x:Name="ComboboxCountry">
+                            <ComboBox.Resources>
+                                <CollectionViewSource x:Key="CountriesSource" Source="{Binding Countries, Mode=OneWay}"/>
+                                <CollectionViewSource x:Key="EmptyCountriesSource" Source="{Binding EmptyCountries, Mode=OneWay}"/>
+                            </ComboBox.Resources>
+                            <ComboBox.ItemsSource>
+                                <CompositeCollection>
+                                    <CollectionContainer Collection="{Binding Source={StaticResource EmptyCountriesSource}, Mode=OneWay}"/>
+                                    <CollectionContainer Collection="{Binding Source={StaticResource CountriesSource}, Mode=OneWay}"/>
+                                </CompositeCollection>
+                            </ComboBox.ItemsSource>
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="{Binding Code, Converter={StaticResource CountryFlagConverter}}" Height="20" Margin="0,0,6,0"/>
+                                        <TextBlock Text="{Binding Title}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <TextBlock Padding="8,4,4,4" IsHitTestVisible="False" Text="country" Foreground="DarkGray">
+                            <TextBlock.Style>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding CountryFilter, Converter={StaticResource IsNullConverter}}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <!--<TextBox Width="60" Padding="4" Text="{Binding CountryFilter, UpdateSourceTrigger=PropertyChanged}" MaxLength="2" TextAlignment="Center" x:Name="TextboxCountry">
+                            <TextBox.Style>
+                                <Style TargetType="{x:Type TextBox}">
+                                    <Setter Property="CharacterCasing" Value="Upper"/>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
+                        <TextBlock Padding="8,4,4,4" IsHitTestVisible="False" Text="country" Foreground="DarkGray">
+                            <TextBlock.Style>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding CountryFilter}" Value=""/>
+                                                <Condition Binding="{Binding IsFocused, ElementName=TextboxCountry}" Value="False"/>
+                                            </MultiDataTrigger.Conditions>
+                                            <MultiDataTrigger.Setters>
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </MultiDataTrigger.Setters>
+                                        </MultiDataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>-->
+                    </Grid>
+                    <Grid>
+                        <TextBox Padding="4" Text="{Binding TitleFilter, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch" x:Name="TextboxTitle"/>
+                        <TextBlock Padding="8,4,4,4" IsHitTestVisible="False" Text="title filter" Foreground="DarkGray">
+                            <TextBlock.Style>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding TitleFilter}" Value=""/>
+                                                <Condition Binding="{Binding IsFocused, ElementName=TextboxTitle}" Value="False"/>
+                                            </MultiDataTrigger.Conditions>
+                                            <MultiDataTrigger.Setters>
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </MultiDataTrigger.Setters>
+                                        </MultiDataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                </DockPanel>
+            </GroupBox>
+        </DockPanel>
+
+        <ListView Grid.Row="1" x:Name="listView" Margin="0,8,0,0" ItemsSource="{Binding Competitions, Mode=OneWay}" SelectedItem="{Binding SelectedCompetition, Mode=TwoWay}" SelectionMode="Single">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="Foreground" Value="{Binding IsCompleted, Converter={StaticResource ListViewItemColorConverter}}"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn DisplayMemberBinding="{Binding EventDate, Mode=OneWay, StringFormat='yyyy-MM-dd'}" Width="80">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Date" Tag="EventDate" Click="GridViewColumnHeader_Click"/>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+                    <GridViewColumn Width="80">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding CountryCode, Mode=OneWay}" HorizontalAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Country" Tag="CountryCode" Click="GridViewColumnHeader_Click"/>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+                    <GridViewColumn DisplayMemberBinding="{Binding Title, Mode=OneWay}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Title" Tag="Title" Click="GridViewColumnHeader_Click"/>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <StatusBar Grid.Row="2" Background="Transparent">
+            <StatusBarItem HorizontalAlignment="Left">
+                <TextBlock Text="{Binding Competitions.Count, Mode=OneWay, StringFormat={}{0} matches}"/>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <CheckBox Content="Reload match data" IsChecked="{Binding ReloadData, Mode=OneWayToSource}" Margin="0,2,0,0"/>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>

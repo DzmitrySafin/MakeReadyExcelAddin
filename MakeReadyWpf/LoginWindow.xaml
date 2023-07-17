@@ -1,0 +1,77 @@
+﻿<Window x:Class="MakeReadyWpf.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MakeReadyWpf"
+        mc:Ignorable="d"
+        Title="Login"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        ShowInTaskbar="True"
+        SizeToContent="Height"
+        d:DesignHeight="160" d:DesignWidth="360" Width="360">
+    <Window.Background>
+        <LinearGradientBrush>
+            <GradientStop Color="DarkOliveGreen" Offset="-0.2"/>
+            <GradientStop Color="LightYellow" Offset="1.2"/>
+        </LinearGradientBrush>
+    </Window.Background>
+
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <TextBox Padding="4" Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" x:Name="TextboxEmail"/>
+            <TextBlock Padding="8,4,4,4" IsHitTestVisible="False" Text="username (email)" Foreground="DarkGray">
+                <TextBlock.Style>
+                    <Style TargetType="{x:Type TextBlock}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Email}" Value=""/>
+                                    <Condition Binding="{Binding IsFocused, ElementName=TextboxEmail}" Value="False"/>
+                                </MultiDataTrigger.Conditions>
+                                <MultiDataTrigger.Setters>
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </MultiDataTrigger.Setters>
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="0,8,0,0">
+            <PasswordBox Grid.Row="1" Padding="4" PasswordChar="*" x:Name="TextboxPassword" Tag="False" PasswordChanged="TextboxPassword_PasswordChanged"/>
+            <TextBlock Padding="8,4,4,4" IsHitTestVisible="False" Text="password" Foreground="DarkGray">
+                <TextBlock.Style>
+                    <Style TargetType="{x:Type TextBlock}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Tag, ElementName=TextboxPassword}" Value="False"/>
+                                    <Condition Binding="{Binding IsFocused, ElementName=TextboxPassword}" Value="False"/>
+                                </MultiDataTrigger.Conditions>
+                                <MultiDataTrigger.Setters>
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </MultiDataTrigger.Setters>
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </Grid>
+
+        <StackPanel Grid.Row="2" Margin="0,8,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Content="Login" Width="80" Margin="0,0,8,0" Padding="4" IsDefault="True" Command="{Binding OkCommand}"/>
+            <Button Content="Cancel" Width="80" Padding="4" IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</Window>

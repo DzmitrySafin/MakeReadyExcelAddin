@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Include>
+  <?define MajorVersion = "0" ?>
+  <?define MinorVersion = "1" ?>
+  <?define BuildVersion = "0" ?>
+  <?define RevisionVersion = "0" ?>
+  <?define ProductVersion = "$(var.MajorVersion).$(var.MinorVersion).$(var.BuildVersion)" ?>
+  <?define ProductName = "$(var.TargetName) $(var.ProductVersion)" ?>
+  <?define UpgradeCode.Guid = "79ec6aa7-a390-48ec-8abb-47e258c7f69f" ?>
+</Include>

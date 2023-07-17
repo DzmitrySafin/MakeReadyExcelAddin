@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?include AssemblyInfo.wxi ?>
+
+  <Product Id="*" Name="$(var.ProductName)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="Dzmitry Safin" UpgradeCode="$(var.UpgradeCode.Guid)">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    <WixVariable Id="WixUIDialogBmp" Value="Images\background.bmp" />
+    <WixVariable Id="WixUIBannerBmp" Value="Images\banner.bmp" />
+    <UIRef Id="WixUI_InstallDir_Custom"/>
+
+    <PropertyRef Id="NETFRAMEWORK45" />
+    <Condition Message="$(var.ProductName) requires .NET Framework 4.5 to be installed.">
+      <![CDATA[Installed OR (NETFRAMEWORK45 >= "#378389")]]>
+    </Condition>
+
+    <Property Id="EXCELEXE_PATH" Secure="yes">
+      <RegistrySearch Id="DetectExcelPath" Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\excel.exe" Name="Path" Type="raw" />
+    </Property>
+    <Property Id="EXCEL2010X64">
+      <ComponentSearch Id="DetectExcel2010x64" Guid="{8B1BF0B4-A1CA-4656-AA46-D11C50BC55A4}" Type="file"/>
+    </Property>
+    <Property Id="EXCEL2013X64">
+      <ComponentSearch Id="DetectExcel2013x64" Guid="{E3BD1151-B9CA-4D45-A77E-51A6E0ED322A}" Type="file"/>
+    </Property>
+    <Property Id="EXCEL2016X64">
+      <ComponentSearch Id="DetectExcel2016x64" Guid="{C4ACE6DB-AA99-401F-8BE6-8784BD09F003}" Type="file"/>
+    </Property>
+    <Condition Message="$(var.ProductName) is based on MS Excel Application. Please, install MS Office Excel x64 (2010/2013/2016) and then retry installing $(var.TargetName).">
+      <![CDATA[(Installed) OR (EXCELEXE_PATH <> "" AND (EXCEL2010X64 OR EXCEL2013X64 OR EXCEL2016X64))]]>
+    </Condition>
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of $(var.TargetName) is already installed." />
+    <Upgrade Id="$(var.UpgradeCode.Guid)">
+      <UpgradeVersion OnlyDetect="yes" Minimum="$(var.ProductVersion)" IncludeMinimum="yes" Property="NEWERFOUND"/>
+      <UpgradeVersion OnlyDetect="no" Minimum="0.0.0" IncludeMinimum="yes" Maximum="$(var.ProductVersion)" IncludeMaximum="no" Property="PREVIOUSFOUND"/>
+    </Upgrade>
+		<MediaTemplate EmbedCab="yes" />
+
+		<Feature Id="ProductFeature" Title="MakeReadySetup" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+		</Feature>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFiles64Folder">
+				<Directory Id="INSTALLFOLDER" Name="$(var.TargetName)" />
+			</Directory>
+		</Directory>
+	</Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Id="MakeReadyAddin" DiskId="1" Guid="{F4588ECD-B1F2-42D0-9957-F6F3E2D08AFF}" KeyPath="yes" Win64="yes">
+        <File Id="proj.Excel" Name="MakeReadyExcel.dll" Source="..\MakeReadyExcel\bin\$(var.Configuration)\MakeReadyExcel.dll" />
+        <File Id="proj.Excel.Vsto" Name="MakeReadyExcel.vsto" Source="..\MakeReadyExcel\bin\$(var.Configuration)\MakeReadyExcel.vsto" />
+        <File Id="proj.Excel.Manifest" Name="MakeReadyExcel.dll.manifest" Source="..\MakeReadyExcel\bin\$(var.Configuration)\MakeReadyExcel.dll.manifest" />
+        <File Id="proj.General" Name="MakeReadyGeneral.dll" Source="..\MakeReadyExcel\bin\$(var.Configuration)\MakeReadyGeneral.dll" />
+        <File Id="proj.Wpf" Name="MakeReadyWpf.dll" Source="..\MakeReadyExcel\bin\$(var.Configuration)\MakeReadyWpf.dll" />
+        <File Id="lib.Utilities" Name="Microsoft.Office.Tools.Common.v4.0.Utilities.dll" Source="..\MakeReadyExcel\bin\$(var.Configuration)\Microsoft.Office.Tools.Common.v4.0.Utilities.dll" />
+        <File Id="lib.Behaviors" Name="Microsoft.Xaml.Behaviors.dll" Source="..\MakeReadyExcel\bin\$(var.Configuration)\Microsoft.Xaml.Behaviors.dll" />
+        <File Id="lib.Newtonsoft" Name="Newtonsoft.Json.dll" Source="..\MakeReadyExcel\bin\$(var.Configuration)\Newtonsoft.Json.dll" />
+        <File Id="lib.NLog" Name="NLog.dll" Source="..\MakeReadyExcel\bin\$(var.Configuration)\NLog.dll" />
+        <File Id="config.NLog" Name="NLog.config" Source="..\MakeReadyExcel\bin\$(var.Configuration)\NLog.config" />
+      </Component>
+      <Component Id="MakeReadyRegistration" Guid="{97AF4F6F-857D-424C-87BE-C6356B5C1CD3}" Win64="yes">
+        <RegistryKey Root="HKLM" Key="Software\Microsoft\Office\Excel\Addins\MakeReadyExcel">
+          <RegistryValue Type="string" Name="FriendlyName" Value="MakeReady Excel Addin" />
+          <RegistryValue Type="string" Name="Description" Value="MakeReady Excel Addin" />
+          <RegistryValue Type="string" Name="Manifest" Value="[INSTALLFOLDER]MakeReadyExcel.vsto|vstolocal" />
+          <RegistryValue Type="integer" Name="LoadBehavior" KeyPath="yes" Value="3"/>
+        </RegistryKey>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

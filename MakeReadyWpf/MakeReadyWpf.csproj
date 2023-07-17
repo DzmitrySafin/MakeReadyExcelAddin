@@ -1,0 +1,238 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{38CC3723-D377-471F-9C66-D74CA23DFB3A}</ProjectGuid>
+    <OutputType>library</OutputType>
+    <RootNamespace>MakeReadyWpf</RootNamespace>
+    <AssemblyName>MakeReadyWpf</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.39\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\MakeReadyGeneral\Properties\AssemblyVersionTemplate.cs">
+      <Link>Properties\AssemblyVersionTemplate.cs</Link>
+    </Compile>
+    <Compile Include="AboutViewModel.cs" />
+    <Compile Include="AboutWindow.xaml.cs">
+      <DependentUpon>AboutWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Converters\ToastModeColorConverter.cs" />
+    <Compile Include="Converters\ToastModeVisibilityConverter.cs" />
+    <Compile Include="Helpers\StaTask.cs" />
+    <Compile Include="ToastViewModel.cs" />
+    <Compile Include="ToastWindow.xaml.cs">
+      <DependentUpon>ToastWindow.xaml</DependentUpon>
+    </Compile>
+    <Page Include="AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CompetitionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LoginWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="AttachedProperties\SortAdorner.cs" />
+    <Compile Include="AttachedProperties\WatermarkAdorner.cs" />
+    <Compile Include="AttachedProperties\WatermarkService.cs" />
+    <Compile Include="Commands\RelayCommand.cs" />
+    <Compile Include="CompetitionViewModel.cs" />
+    <Compile Include="CompetitionWindow.xaml.cs">
+      <DependentUpon>CompetitionWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\CustomDatePicker.cs" />
+    <Compile Include="Converters\CountryFlagConverter.cs" />
+    <Compile Include="Converters\IsNullConverter.cs" />
+    <Compile Include="Converters\ListViewItemColorConverter.cs" />
+    <Compile Include="Converters\NonEmptyConverter.cs" />
+    <Compile Include="Controls\CustomControl1.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="ToastWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="LoginViewModel.cs" />
+    <Compile Include="LoginWindow.xaml.cs">
+      <DependentUpon>LoginWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MakeReadyGeneral\MakeReadyGeneral.csproj">
+      <Project>{5742c307-8ede-41b8-b46e-3bc1fe5976e2}</Project>
+      <Name>MakeReadyGeneral</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\CA.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\AT.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\AU.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\BR.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\FI.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\HU.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\LV.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\MD.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\MN.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\RU.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\TH.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\US.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\BG.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\DE.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\FR.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\GR.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\HN.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\IL.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\IT.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\KG.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\KZ.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\LT.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\PL.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\RS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\UA.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\CZ.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\BY.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\UZ.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\EE.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\SK.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\PG.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Flags\PT.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

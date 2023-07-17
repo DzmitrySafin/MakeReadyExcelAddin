@@ -1,0 +1,58 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="..\References\SetupCustomize.dll" #>
+<#@ import namespace="SetupCustomize" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+using System.Reflection;
+
+[assembly: AssemblyVersion("<#= Version() #>")]
+[assembly: AssemblyFileVersion("<#= Version() #>")]
+<#+
+    int MajorVersion = -1;
+    int MinorVersion = -1;
+    int BuildVersion = -1;
+    int RevisionVersion = -1;
+    string wxiName = "..\\MakeReadySetup\\AssemblyInfo.wxi";
+
+    private string Version()
+    {
+        List<string> wxiLines = InfoFile.LoadWxiContent(wxiName);
+        if (wxiLines == null || wxiLines.Count == 0) throw new Exception($"Error parsing WXI file.");
+
+        foreach (string line in wxiLines)
+        {
+            var pair = line.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+            if (pair.Length == 2)
+            {
+                string line0 = pair[0].Trim();
+                string line1 = pair[1].Trim().Trim('\"', '\'');
+                switch (line0)
+                {
+                    case "MajorVersion":
+                    {
+                        int.TryParse(line1, out this.MajorVersion);
+                        break;
+                    }
+                    case "MinorVersion":
+                    {
+                        int.TryParse(line1, out this.MinorVersion);
+                        break;
+                    }
+                    case "BuildVersion":
+                    {
+                        int.TryParse(line1, out this.BuildVersion);
+                        break;
+                    }
+                    case "RevisionVersion":
+                    {
+                        int.TryParse(line1, out this.RevisionVersion);
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (MajorVersion < 0 || MinorVersion < 0 || BuildVersion < 0 || RevisionVersion < 0) throw new Exception($"Could not find all needed version components in WXI file.");
+        return($"{MajorVersion}.{MinorVersion}.{BuildVersion}.{RevisionVersion}");
+    }
+#>

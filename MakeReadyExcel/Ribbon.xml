@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="Ribbon_Load">
+  <ribbon>
+    <tabs>
+      <tab id="tabMakeReady" label="Make Ready">
+        <group id="grpGeneral" getLabel="GrpGeneral_Label">
+			<button id="btnLogin" size="large" label="Login"
+					getEnabled="BtnLogin_Enabled"
+					getImage="BtnLogin_Image"
+					onAction="BtnLogin_Action" />
+			<button id="btnLogout" size="large" label="Logout"
+					getEnabled="BtnLogout_Enabled"
+					getImage="BtnLogout_Image"
+					onAction="BtnLogout_Action" />
+			<button id="btnAbout" size="large" label="About"
+					getImage="BtnAbout_Image"
+					onAction="BtnAbout_Action" />
+        </group>
+		<group id="grpCompetition" getLabel="GrpCompetition_Label">
+			<button id="btnRefresh" size="large"
+					getEnabled="BtnRefresh_Enabled"
+					getLabel="BtnRefresh_Label"
+					getImage="BtnRefresh_Image"
+					onAction="BtnRefresh_Action" />
+			<button id="btnSelect" size="large" label="Select match"
+					getEnabled="BtnSelect_Enabled"
+					getImage="BtnSelect_Image"
+					onAction="BtnSelect_Action" />
+			<button id="btnSave" size="large" label="Insert data"
+					getEnabled="BtnSave_Enabled"
+					getImage="BtnSave_Image"
+					onAction="BtnSave_Action" />
+			<button id="btnDelete" size="large" label="Delete data"
+					getEnabled="BtnDelete_Enabled"
+					getImage="BtnDelete_Image"
+					onAction="BtnDelete_Action" />
+		</group>
+		<group id="grpDivision" getLabel="GrpDivision_Label">
+			<labelControl id="lblCompetition" getLabel="LblCompetition_Label"/>
+			<dropDown id="dropDivisions" label="Division" sizeString="xxxxxxxxx0xxxxxxxxx0xxxxxxxxx0xxxxxxxxx0"
+					  getEnabled="DropDivisions_Enabled"
+					  getItemCount="DropDivisions_ItemCount"
+					  getItemID="DropDivisions_ItemId"
+					  getItemLabel="DropDivisions_ItemLabel"
+					  getSelectedItemIndex="DropDivisions_SelectedIndex"
+					  onAction="DropDivisions_Action"/>
+			<dropDown id="dropShooters" label="Shooter" sizeString="xxxxxxxxx0xxxxxxxxx0xxxxxxxxx0xxxxxxxxx0"
+					  getEnabled="DropShooters_Enabled"
+					  getItemCount="DropShooters_ItemCount"
+					  getItemID="DropShooters_ItemId"
+					  getItemLabel="DropShooters_ItemLabel"
+					  getSelectedItemIndex="DropShooters_SelectedIndex"
+					  onAction="DropShooters_Action"/>
+		</group>
+		<group id="grpCharts" label="Charts">
+      <splitButton id="splitChart1" size="large" getEnabled="SplitChart1_Enabled">
+        <button id="btnChart1" label="Division Chart" imageMso="ChartEditDataSource"/>
+        <menu id="menuChart1" itemSize="large">
+          <button id="btnChart1User" label="by Shooter" imageMso="Chart3DBarChart" onAction="BtnChart1User_Action"/>
+          <button id="btnChart1Stage" label="by Stage" imageMso="Chart3DColumnChart" onAction="BtnChart1Stage_Action"/>
+        </menu>
+      </splitButton>
+      <button id="btnChart2" size="large" label="Shooter Chart"
+              imageMso="Chart3DPieChart"
+              getEnabled="BtnChart2_Enabled"
+              onAction="BtnChart2_Action"/>
+      <button id="btnChart3" size="large" label="Search Shooter"
+              imageMso="ChartRadarChart"
+              getEnabled="BtnChart3_Enabled"
+              onAction="BtnChart3_Action"/>
+      <!--<button id="btnChart3" size="large" label="Chart #3" imageMso="ChartAreaChart"/>
+			<button id="btnChart5" size="large" label="Chart #5" imageMso="TableExcelSpreadsheetInsert"/>-->
+		</group>
+	  </tab>
+    </tabs>
+  </ribbon>
+</customUI>
