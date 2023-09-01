@@ -2,7 +2,7 @@
 <Include>
   <?define MajorVersion = "0" ?>
   <?define MinorVersion = "1" ?>
-  <?define BuildVersion = "3" ?>
+  <?define BuildVersion = "4" ?>
   <?define RevisionVersion = "0" ?>
   <?define ProductVersion = "$(var.MajorVersion).$(var.MinorVersion).$(var.BuildVersion)" ?>
   <?define ProductName = "$(var.TargetName) $(var.ProductVersion)" ?>

@@ -493,7 +493,7 @@ namespace MakeReadyExcel
             Excel.Worksheet ws = Application.ActiveWorkbook.Worksheets.Add();
 
             Shooter currentShooter = FilteredShooters.First(sh => sh.Id == SelectedShooterId);
-            CreateChartSingleShooter(ws, SelectedCompetition, currentShooter, 1);
+            CreateChartSingleShooter(ws, SelectedCompetition, currentShooter, 1, true);
         }
 
         public void Chart3SingleShooter()
@@ -502,12 +502,15 @@ namespace MakeReadyExcel
 
             int row = 1;
             Shooter currentShooter = FilteredShooters.First(sh => sh.Id == SelectedShooterId);
-            foreach (var competition in StandbyData.Competitions.Where(c => c.IsCompleted))
+            string[] names = currentShooter.ShortName.Split(new[] { '\x20', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+            string lastName = names[0];
+            string firstName = names.Length > 1 ? names[1] : names[0];
+            foreach (var competition in StandbyData.Competitions.Where(c => c.IsCompleted).OrderByDescending(c => c.EventDate))
             {
-                Shooter shooter = competition.Divisions.SelectMany(d => d.Shooters).FirstOrDefault(sh => sh.Name.Contains(currentShooter.ShortName));
-                if (shooter != null)
+                var shooters = competition.Divisions.SelectMany(d => d.Shooters).Where(sh => sh.Name.Contains(lastName) && sh.Name.Contains(firstName)).ToList();
+                foreach (Shooter shooter in shooters)
                 {
-                    row = CreateChartSingleShooter(ws, competition, shooter, row);
+                    row = CreateChartSingleShooter(ws, competition, shooter, row, false);
                 }
             }
         }
@@ -812,7 +815,7 @@ namespace MakeReadyExcel
             }
         }
 
-        private int CreateChartSingleShooter(Excel.Worksheet ws, Competition competition, Shooter shooter, int startRow)
+        private int CreateChartSingleShooter(Excel.Worksheet ws, Competition competition, Shooter shooter, int startRow, bool drawGraph)
         {
             string decSeparator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
             Excel.ChartObjects charts = (Excel.ChartObjects)ws.ChartObjects(Type.Missing);
@@ -924,9 +927,9 @@ namespace MakeReadyExcel
             pieChart.ApplyLayout(6);
             pieChart.ChartTitle.Delete();
 
-            // pie chart
+            // percent/time/HF by stage graph
             int lastRow = rF + chartHeight + 3;
-            if (stages.Count > 1)
+            if (stages.Count > 1 && drawGraph)
             {
                 // percent by stage graph
                 double gLeft = ws.Cells[row, col + 1].Left;
