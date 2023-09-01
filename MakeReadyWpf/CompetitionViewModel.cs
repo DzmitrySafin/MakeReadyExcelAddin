@@ -90,7 +90,7 @@ namespace MakeReadyWpf
                 }
                 else
                 {
-                    accepted &= competition.EventDate == DateStart;
+                    accepted &= competition.EventDate >= DateStart;
                 }
             }
 
