@@ -25,7 +25,7 @@ namespace MakeReadyExcel
         // <OPTION value="deab6b3283a4afa572e54406da3adbc4">09.02.2023 BY ЗачОтный стейдж.Февраль (Level 1)</OPTION>
         private static Regex competitionRegex = new Regex(@"<OPTION\s+value=""(?<id>\w+)"">(?<date>\d{2}\.\d{2}\.\d{4})\s+(?<country>\w{2})\s+(?<title>.+)</OPTION>", RegexOptions.IgnoreCase);
         // <FORM action="/cgi-bin/get.cgi?alias=userlevel" method=POST name="loginform_s" onsubmit="return checkform_s(this)">
-        private static Regex loggedoutRegex = new Regex(@"<FORM\s+action=""/cgi-bin/get\.cgi\?alias=userlevel""\s+method=POST\s+name=""loginform_s""\s+onsubmit=""return\s+checkform_s\(this\)"">", RegexOptions.IgnoreCase);
+        private static Regex loggedoutRegex = new Regex(@"<FORM\s+action=""/cgi-bin/get\.cgi\?alias=userlevel""\s+method=""?POST""?\s+name=""?loginform_s""?\s+onsubmit=""return\s+checkform_s\(this\)"">", RegexOptions.IgnoreCase);
         // <div class="FI">Сафин Дмитрий</div>
         private static Regex usernameRegex = new Regex(@"<div\s+class=""FI"">(?<name>[\w\s]+)</div>", RegexOptions.IgnoreCase);
         // <DIV class="auth_msg_red">[\N]Такого пользователя нет в базе данных. <P>Попробуйте авторизоваться снова.</P>[\N]</DIV>
@@ -225,7 +225,7 @@ namespace MakeReadyExcel
                     foreach (Match match in matches)
                     {
                         string date = match.Groups["date"].Value;
-                        DateTime.TryParseExact(date, "dd.MM.yyyy", null, System.Globalization.DateTimeStyles.None, out DateTime dt);
+                        DateTime.TryParseExact(date, "dd.MM.yyyy", null, DateTimeStyles.None, out DateTime dt);
                         var competition = new Competition(match.Groups["id"].Value, dt, match.Groups["country"].Value, match.Groups["title"].Value);
                         //competition.Country = Countries.FirstOrDefault(c => c.Code == competition.CountryCode);
                         competitions.Add(competition);

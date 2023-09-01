@@ -173,6 +173,12 @@ namespace MakeReadyWpf
             SetTimer(4000);
         }
 
+        public void HideToast()
+        {
+            _closingWindow = true;
+            SetTimer(500);
+        }
+
         #region Commands
 
         public ICommand CloseCommand

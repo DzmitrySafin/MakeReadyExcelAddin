@@ -178,25 +178,31 @@ namespace MakeReadyExcel
 
         #region Login/Logout
 
-        private async Task<bool> LoginCallback()
+        public async Task<bool> Login()
         {
-            var vm = new LoginViewModel(Settings.Default.UserEmail);
             bool? result;
+            var vm = new LoginViewModel(Settings.Default.UserEmail);
+            Toast.ShowToast("Log In", $"Logging into {WebSiteName} ...", true, true);
 
-            Toast.ShowToast(null, $"Logging in to {WebSiteName} ...", true, true);
             using (Application.SwitchCursor(Excel.XlMousePointer.xlNorthwestArrow))
             {
                 result = await StaTask.RunStaTask(() =>
                 {
                     return new LoginWindow(vm).ShowDialog();
                 });
-            }
-            if (result != true) return false;
 
-            result = Task.Run(async () => await StandbyConnector.Login(vm.Email, vm.Password)).Result;
+                if (result != true)
+                {
+                    Toast.HideToast();
+                    return false;
+                }
+
+                result = await StandbyConnector.Login(vm.Email, vm.Password);
+            }
+
             if (result == true)
             {
-                Toast.CompleteProgress($"Successfully logged in to {WebSiteName}");
+                Toast.CompleteProgress($"Successfully logged into {WebSiteName}");
                 Settings.Default.LoginTime = StandbyConnector.LoginTimestamp;
                 Settings.Default.UserEmail = StandbyConnector.LoginEmail;
                 Settings.Default.UserToken = StandbyConnector.LoginToken;
@@ -205,17 +211,46 @@ namespace MakeReadyExcel
             }
             else if (result == false)
             {
-                Toast.CompleteProgress($"Could not login to {WebSiteName}\nEmail and/or password might be incorrect.", true);
+                Toast.CompleteProgress($"Could not log into {WebSiteName}\nEmail and/or password might be incorrect.", true);
             }
             else
             {
-                Toast.CompleteProgress($"Could not login to {WebSiteName}\nPlease, try again later.", true);
+                Toast.CompleteProgress($"Could not log into {WebSiteName}\nResponse is not as expected.", true);
             }
 
             return result == true;
         }
 
-        public async Task LoginAndLoad()
+        public async Task<bool> Logout()
+        {
+            bool? result;
+            Toast.ShowToast("Log Out", $"Logging out from {WebSiteName} ...", true, true);
+
+            using (Application.SwitchCursor(Excel.XlMousePointer.xlWait))
+            {
+                result = await StandbyConnector.Logout();
+            }
+
+            if (result == true)
+            {
+                Toast.CompleteProgress($"Successfully logged out from {WebSiteName}");
+                Settings.Default.UserToken = "";
+                Settings.Default.UserName = "";
+                Settings.Default.Save();
+            }
+            else if (result == false)
+            {
+                Toast.CompleteProgress($"Could not log out from {WebSiteName}\nLogin cookie might be incorrect.", true);
+            }
+            else
+            {
+                Toast.CompleteProgress($"Could not log out from {WebSiteName}\nResponse is not as expected.", true);
+            }
+
+            return result == true;
+        }
+
+        public async Task<bool> LoadCompetitions()
         {
             await StaTask.RunStaTask(() =>
             {
@@ -225,16 +260,16 @@ namespace MakeReadyExcel
             List<Competition> competitions;
             using (Application.SwitchCursor(Excel.XlMousePointer.xlWait))
             {
-                competitions = Task.Run(async () => await StandbyConnector.LoadCompetitions(LoginCallback)).Result;
+                competitions = await StandbyConnector.LoadCompetitions(Login);
             }
 
             if (competitions == null)
             {
-                Toast.CompleteProgress("Could not load matches from MakeReady.", true);
+                Toast.CompleteProgress($"Could not load matches from {WebSiteName}", true);
             }
             else if (competitions.Count == 0)
             {
-                Toast.CompleteProgress("Cancelled, or nothing to be loaded from MakeReady.", true);
+                Toast.CompleteProgress($"Could not load matches from {WebSiteName}\nResponse is not as expected.", true);
             }
             else
             {
@@ -255,41 +290,17 @@ namespace MakeReadyExcel
                     StandbyData.Competitions = competitions;
                 }
                 UpdateOpenedWorkbooks();
-            }
-        }
-
-        public void Logout()
-        {
-            Toast.ShowToast("Logout", "Logging out from MakeReady.by ...", true, true);
-
-            bool? result;
-            using (Application.SwitchCursor(Excel.XlMousePointer.xlWait))
-            {
-                result = Task.Run(async () => await StandbyConnector.Logout()).Result;
+                return true;
             }
 
-            if (result == true)
-            {
-                Toast.CompleteProgress($"Successfully logged out from MakeReady.by");
-                Settings.Default.UserToken = "";
-                Settings.Default.UserName = "";
-                Settings.Default.Save();
-            }
-            else if (result == false)
-            {
-                Toast.CompleteProgress("Could not logout from MakeReady.by\nLogin cookie might be incorrect.", true);
-            }
-            else
-            {
-                Toast.CompleteProgress("Could not logout from MakeReady.by\nPlease, try again later.", true);
-            }
+            return false;
         }
 
         #endregion
 
         #region Shooters
 
-        public async Task SelectMatchAndShooters()
+        public async Task<bool> SelectMatchAndShooters()
         {
             var vm = new CompetitionViewModel(StandbyData.Competitions);
             vm.CountryFilter = Settings.Default.FilterCountry;
@@ -303,7 +314,8 @@ namespace MakeReadyExcel
             {
                 return new CompetitionWindow(vm).ShowDialog();
             });
-            if (result != true) return;
+            if (result != true) return false;
+
             Settings.Default.FilterCountry = vm.CountryFilter;
             Settings.Default.FilterDateStart = vm.DateStart.HasValue ? vm.DateStart.Value : DateTime.MinValue;
             Settings.Default.FilterDateEnd = vm.DateEnd.HasValue ? vm.DateEnd.Value : DateTime.MinValue;
@@ -312,56 +324,59 @@ namespace MakeReadyExcel
             SelectedCompetition = vm.SelectedCompetition;
             if (!SelectedCompetition.IsCompleted || vm.ReloadData)
             {
-                await LoadShooters(SelectedCompetition);
+                result = await LoadShooters(SelectedCompetition);
             }
             else
             {
                 DivisionItemSelected(-1, 0);
             }
+
+            return result == true;
         }
 
-        private async Task LoadShooters(Competition competition)
+        private async Task<bool> LoadShooters(Competition competition)
         {
             Tuple<List<Shooter>, List<Stage>> tuple;
             using (Application.SwitchCursor(Excel.XlMousePointer.xlWait))
             {
                 Toast.ShowToast("Load match data", "Loading shooters data", true, true);
-                tuple = Task.Run(async () => await StandbyConnector.LoadShooters(competition.Id, LoginCallback)).Result;
+                tuple = await StandbyConnector.LoadShooters(competition.Id, Login);
             }
 
             if (tuple == null)
             {
-                Toast.ShowToast("Load match data", "Could not load shooters/stages from MakeReady.", false, false, true);
+                Toast.ShowToast("Load match data", $"Could not load shooters/stages from {WebSiteName}", false, false, true);
+                return false;
+            }
+
+            competition.Stages = tuple.Item2;
+            competition.StagesCount = tuple.Item2.Count;
+            competition.TotalPoints = tuple.Item2.Sum(s => s.MaxPoints);
+
+            List<Shooter> shooters = tuple.Item1.Where(sh => !sh.Name.StartsWith("MegaBeast")).ToList();
+            competition.Divisions = CreateDivisions(shooters);
+            competition.ShootersCount = shooters.Count;
+
+            if (!LoadStages(competition.Id, competition.StagesCount, shooters))
+            {
+                Toast.CompleteProgress($"Could not load shooters results from {WebSiteName}", true);
+                return false;
             }
             else
             {
-                competition.Stages = tuple.Item2;
-                competition.StagesCount = tuple.Item2.Count;
-                competition.TotalPoints = tuple.Item2.Sum(s => s.MaxPoints);
-
-                List<Shooter> shooters = tuple.Item1.Where(sh => !sh.Name.StartsWith("MegaBeast")).ToList();
-                competition.Divisions = CreateDivisions(shooters);
-                competition.ShootersCount = shooters.Count;
-
-                if (!LoadStages(competition.Id, competition.StagesCount, shooters))
-                {
-                    Toast.CompleteProgress("Could not load shooters results from MakeReady.", true);
-                    return;
-                }
-                else
-                {
-                    Toast.CompleteProgress("Shooters data has been loaded successfully.");
-                }
-
-                competition.IsCompleted = true;
-                competition.CalculateStatistics();
-                DivisionItemSelected(-1, 0);
-
-                await StaTask.RunStaTask(() =>
-                {
-                    UpdateOpenedWorkbooks();
-                });
+                Toast.CompleteProgress("Shooters data has been loaded successfully.");
             }
+
+            competition.IsCompleted = true;
+            competition.CalculateStatistics();
+            DivisionItemSelected(-1, 0);
+
+            await StaTask.RunStaTask(() =>
+            {
+                UpdateOpenedWorkbooks();
+            });
+
+            return true;
         }
 
         private List<Division> CreateDivisions(List<Shooter> shooters)
@@ -393,7 +408,7 @@ namespace MakeReadyExcel
                 {
                     shooter.SetAdditionalProperties();
                     Toast.SetPercentage($"Loading data for {shooter.ShortName} ({++counter} of {shooters.Count})", shooters.Count, counter);
-                    var accuracy = Task.Run(async () => await StandbyConnector.LoadAccuracy(competitionId, shooter.Id, LoginCallback)).Result;
+                    var accuracy = Task.Run(async () => await StandbyConnector.LoadAccuracy(competitionId, shooter.Id, Login)).Result;
                     if (accuracy == null)
                     {
                         if (competitionId == "1585cd3ab8b723c8b4869b02ecf38b10" && shooter.Id == 4)

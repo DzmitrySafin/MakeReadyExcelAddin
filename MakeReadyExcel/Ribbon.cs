@@ -1,13 +1,11 @@
 ﻿using MakeReadyExcel.Helpers;
 using MakeReadyExcel.Properties;
 using System;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using System.Windows;
 using Office = Microsoft.Office.Core;
 
 namespace MakeReadyExcel
@@ -53,8 +51,11 @@ namespace MakeReadyExcel
 
         public async Task BtnLogin_Action(Office.IRibbonControl control)
         {
-            await Globals.ThisAddIn.LoginAndLoad();
-            ribbon.Invalidate();
+            //await Globals.ThisAddIn.LoginAndLoad();
+            if (await Globals.ThisAddIn.Login())
+            {
+                ribbon.Invalidate();
+            }
         }
 
         public bool BtnLogout_Enabled(Office.IRibbonControl control)
@@ -67,10 +68,12 @@ namespace MakeReadyExcel
             return ImageConverter.Convert(Resources.Logout);
         }
 
-        public void BtnLogout_Action(Office.IRibbonControl control)
+        public async Task BtnLogout_Action(Office.IRibbonControl control)
         {
-            Globals.ThisAddIn.Logout();
-            ribbon.Invalidate();
+            if (await Globals.ThisAddIn.Logout())
+            {
+                ribbon.Invalidate();
+            }
         }
 
         public stdole.IPictureDisp BtnAbout_Image(Office.IRibbonControl control)
@@ -109,9 +112,14 @@ namespace MakeReadyExcel
 
         public async Task BtnRefresh_Action(Office.IRibbonControl control)
         {
-            await Globals.ThisAddIn.LoginAndLoad();
-            await Globals.ThisAddIn.SelectMatchAndShooters();
-            ribbon.Invalidate();
+            if (await Globals.ThisAddIn.LoadCompetitions())
+            {
+                ribbon.Invalidate();
+                if (await Globals.ThisAddIn.SelectMatchAndShooters())
+                {
+                    ribbon.Invalidate();
+                }
+            }
         }
 
         public bool BtnSelect_Enabled(Office.IRibbonControl control)
@@ -126,8 +134,10 @@ namespace MakeReadyExcel
 
         public async Task BtnSelect_Action(Office.IRibbonControl control)
         {
-            await Globals.ThisAddIn.SelectMatchAndShooters();
-            ribbon.Invalidate();
+            if (await Globals.ThisAddIn.SelectMatchAndShooters())
+            {
+                ribbon.Invalidate();
+            }
         }
 
         public bool BtnSave_Enabled(Office.IRibbonControl control)
