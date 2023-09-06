@@ -130,7 +130,11 @@ namespace MakeReadyExcel
                     Match match = loginfailRegex.Match(ResponseContent);
                     if (match.Success)
                     {
-                        // login failed
+                        logger.Warn("Received 'Login failed' response.");
+                    }
+                    else
+                    {
+                        logger.Warn("Could not log in. Response not recognized.");
                     }
                 }
 
@@ -180,6 +184,7 @@ namespace MakeReadyExcel
             }
             else
             {
+                logger.Warn("Could not log out. Response not recognized.");
                 return false;
             }
         }
@@ -215,10 +220,18 @@ namespace MakeReadyExcel
                     var matches = competitionRegex.Matches(ResponseContent);
                     if (matches.Count == 0)
                     {
-                        if (loggedoutRegex.IsMatch(ResponseContent) && loginCallback != null && await loginCallback.Invoke())
+                        if (loggedoutRegex.IsMatch(ResponseContent) && loginCallback != null)
                         {
-                            return await LoadCompetitions();
+                            logger.Warn("Received 'Logged out' response. Trying to log in before loading list of matches...");
+                            if (await loginCallback.Invoke())
+                            {
+                                return await LoadCompetitions();
+                            }
                         }
+                    }
+                    if (matches.Count == 0)
+                    {
+                        logger.Warn("Could not load matches. Response not recognized.");
                     }
 
                     var competitions = new List<Competition>();
@@ -264,9 +277,13 @@ namespace MakeReadyExcel
                         return null;
                     }
 
-                    if (loggedoutRegex.IsMatch(ResponseContent) && loginCallback != null && await loginCallback.Invoke())
+                    if (loggedoutRegex.IsMatch(ResponseContent) && loginCallback != null)
                     {
-                        return await LoadShooters(competitionId);
+                        logger.Warn("Received 'Logged out' response. Trying to log in before loading list of shooters...");
+                        if (await loginCallback.Invoke())
+                        {
+                            return await LoadShooters(competitionId);
+                        }
                     }
 
                     try
@@ -380,9 +397,13 @@ namespace MakeReadyExcel
                         return null;
                     }
 
-                    if (loggedoutRegex.IsMatch(ResponseContent) && loginCallback != null && await loginCallback.Invoke())
+                    if (loggedoutRegex.IsMatch(ResponseContent) && loginCallback != null)
                     {
-                        return await LoadAccuracy(competitionId, shooterId);
+                        logger.Warn("Received 'Logged out' response. Trying to log in before loading shooter's results...");
+                        if (await loginCallback.Invoke())
+                        {
+                            return await LoadAccuracy(competitionId, shooterId);
+                        }
                     }
 
                     try

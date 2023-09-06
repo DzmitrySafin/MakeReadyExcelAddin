@@ -4,7 +4,6 @@ using MakeReadyExcel.Properties;
 using MakeReadyGeneral.Models;
 using MakeReadyWpf;
 using MakeReadyWpf.Helpers;
-using Microsoft.Office.Interop.Excel;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -118,21 +117,29 @@ namespace MakeReadyExcel
 
         private void UpdateOpenedWorkbooks()
         {
-            foreach (Excel.Workbook wb in Application.Workbooks)
+            try
             {
-                var xmlPart = wb.GetCustomXmlPart(XmlPartName);
-                if (xmlPart != null)
+                foreach (Excel.Workbook wb in Application.Workbooks)
                 {
-                    var xmlSerializer = new XmlSerializer(typeof(Performance));
-                    var sb = new StringBuilder();
-                    using (TextWriter tw = new StringWriter(sb))
+                    var xmlPart = wb.GetCustomXmlPart(XmlPartName);
+                    if (xmlPart != null)
                     {
-                        xmlSerializer.Serialize(tw, StandbyData);
-                    }
+                        var xmlSerializer = new XmlSerializer(typeof(Performance));
+                        var sb = new StringBuilder();
+                        using (TextWriter tw = new StringWriter(sb))
+                        {
+                            xmlSerializer.Serialize(tw, StandbyData);
+                        }
 
-                    wb.SetCustomXmlPart(XmlPartName, sb.ToString());
-                    wb.Saved = false;
+                        wb.SetCustomXmlPart(XmlPartName, sb.ToString());
+                        wb.Saved = false;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+                Toast.ShowToast("Update workbook info", $"Error occured when trying to update workbook data.\n{ex.Message}", false, false, true);
             }
         }
 
@@ -426,15 +433,19 @@ namespace MakeReadyExcel
                         }
                         else
                         {
-                            logger.Warn($"Could not load data for shooter {shooter.Id} ({shooter.ShortName}), match {competitionId}");
                             accuracy = StageResult.CreateDefaultList(stagesCount);
+                            string msg = $"Could not load data for shooter {shooter.Id} ({shooter.ShortName}), match {competitionId}.";
+                            logger.Warn(msg);
+                            Toast.ShowToast("Load shooters results", msg, false, false, true);
                             //success = false;
                             //break;
                         }
                     }
                     else if (accuracy.Count != stagesCount)
                     {
-                        logger.Error($"Number of results doesn't fit number of stages for shooter {shooter.Id} ({shooter.ShortName}), match {competitionId}");
+                        string msg = $"Number of results doesn't fit number of stages for shooter {shooter.Id} ({shooter.ShortName}), match {competitionId}";
+                        logger.Error(msg);
+                        Toast.ShowToast("Load shooters results", msg, false, false, true);
                         success = false;
                         break;
                     }
@@ -599,8 +610,8 @@ namespace MakeReadyExcel
                 // center headers on the top row
                 ws.Range[ws.Cells[rH, c2], ws.Cells[rH, cEx-1]].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
                 // mark results columns with color
-                ws.Range[ws.Cells[rH, c2], ws.Cells[rH, c2+5]].Interior.Color = XlRgbColor.rgbLightGreen;
-                ws.Cells[rH, c8+1].Interior.Color = XlRgbColor.rgbLightGreen;
+                ws.Range[ws.Cells[rH, c2], ws.Cells[rH, c2+5]].Interior.Color = Excel.XlRgbColor.rgbLightGreen;
+                ws.Cells[rH, c8+1].Interior.Color = Excel.XlRgbColor.rgbLightGreen;
                 // top/left corner - bigger font for shooter name
                 ws.Range[ws.Cells[rH, col], ws.Cells[rH, col]].Font.Size++;
                 // vertical borders
@@ -796,8 +807,8 @@ namespace MakeReadyExcel
                 // center headers on the top row
                 ws.Range[ws.Cells[rH, c2], ws.Cells[rH, cEx-1]].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
                 // mark results columns with color
-                ws.Range[ws.Cells[rH, c2], ws.Cells[rH, c2 + 5]].Interior.Color = XlRgbColor.rgbLightGreen;
-                ws.Cells[rH, c8+1].Interior.Color = XlRgbColor.rgbLightGreen;
+                ws.Range[ws.Cells[rH, c2], ws.Cells[rH, c2 + 5]].Interior.Color = Excel.XlRgbColor.rgbLightGreen;
+                ws.Cells[rH, c8+1].Interior.Color = Excel.XlRgbColor.rgbLightGreen;
                 // top/left corner - bigger font for shooter name
                 ws.Range[ws.Cells[rH, col], ws.Cells[rH, col]].Font.Size++;
                 // vertical borders
