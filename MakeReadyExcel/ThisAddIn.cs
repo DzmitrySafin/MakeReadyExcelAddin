@@ -4,6 +4,7 @@ using MakeReadyExcel.Properties;
 using MakeReadyGeneral.Models;
 using MakeReadyWpf;
 using MakeReadyWpf.Helpers;
+using Microsoft.Office.Interop.Excel;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -597,6 +598,9 @@ namespace MakeReadyExcel
                 ws.Range[ws.Cells[rH, col], ws.Cells[rF, col]].Font.Bold = true;
                 // center headers on the top row
                 ws.Range[ws.Cells[rH, c2], ws.Cells[rH, cEx-1]].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                // mark results columns with color
+                ws.Range[ws.Cells[rH, c2], ws.Cells[rH, c2+5]].Interior.Color = XlRgbColor.rgbLightGreen;
+                ws.Cells[rH, c8+1].Interior.Color = XlRgbColor.rgbLightGreen;
                 // top/left corner - bigger font for shooter name
                 ws.Range[ws.Cells[rH, col], ws.Cells[rH, col]].Font.Size++;
                 // vertical borders
@@ -791,6 +795,9 @@ namespace MakeReadyExcel
                 ws.Range[ws.Cells[rH, col], ws.Cells[rF, col]].Font.Bold = true;
                 // center headers on the top row
                 ws.Range[ws.Cells[rH, c2], ws.Cells[rH, cEx-1]].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                // mark results columns with color
+                ws.Range[ws.Cells[rH, c2], ws.Cells[rH, c2 + 5]].Interior.Color = XlRgbColor.rgbLightGreen;
+                ws.Cells[rH, c8+1].Interior.Color = XlRgbColor.rgbLightGreen;
                 // top/left corner - bigger font for shooter name
                 ws.Range[ws.Cells[rH, col], ws.Cells[rH, col]].Font.Size++;
                 // vertical borders
