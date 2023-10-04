@@ -18,6 +18,9 @@ namespace MakeReadyGeneral.Models
         public DateTime EventDate { get; set; }
 
         [XmlAttribute]
+        public int Level { get; set; }
+
+        [XmlAttribute]
         public string CountryCode { get; set; }
 
         [XmlAttribute]
@@ -58,10 +61,11 @@ namespace MakeReadyGeneral.Models
             // parameterless constructor for XML (de)serialization
         }
 
-        public Competition(string id, DateTime dt, string country, string title)
+        public Competition(string id, DateTime dt, int level, string country, string title)
         {
             Id = id;
             EventDate = dt;
+            Level = level;
             CountryCode = country;
             Title = title;
         }

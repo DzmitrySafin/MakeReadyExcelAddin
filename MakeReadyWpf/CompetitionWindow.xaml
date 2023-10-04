@@ -44,7 +44,7 @@
                 <DockPanel HorizontalAlignment="Stretch">
                     <controls:CustomDatePicker Width="120" Margin="0,0,8,0" SelectedDate="{Binding DateStart}" WatermarkText=" start period"/>
                     <controls:CustomDatePicker Width="120" SelectedDate="{Binding DateEnd}" WatermarkText=" end period"/>
-                    <Grid Margin="8,0,8,0">
+                    <Grid Margin="8,0,0,0">
                         <ComboBox Width="150" Padding="4" IsEditable="False" SelectedValuePath="Code" SelectedValue="{Binding CountryFilter}" x:Name="ComboboxCountry">
                             <ComboBox.Resources>
                                 <CollectionViewSource x:Key="CountriesSource" Source="{Binding Countries, Mode=OneWay}"/>
@@ -78,7 +78,23 @@
                             </TextBlock.Style>
                         </TextBlock>
                     </Grid>
-                    <Grid>
+                    <Grid Margin="8,0,0,0">
+                        <ComboBox Width="52" Padding="4" IsEditable="False" ItemsSource="{Binding Levels}" SelectedValuePath="Level" DisplayMemberPath="Title" SelectedValue="{Binding LevelFilter}">
+                        </ComboBox>
+                        <TextBlock Padding="8,4,4,4" IsHitTestVisible="False" Text="level" Foreground="DarkGray">
+                            <TextBlock.Style>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding LevelFilter, Converter={StaticResource IsNullConverter}}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                    <Grid Margin="8,0,0,0">
                         <TextBox Padding="4" Text="{Binding TitleFilter, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch" x:Name="TextboxTitle"/>
                         <TextBlock Padding="8,4,4,4" IsHitTestVisible="False" Text="title filter" Foreground="DarkGray">
                             <TextBlock.Style>
@@ -111,6 +127,13 @@
                     <Setter Property="Foreground" Value="{Binding IsCompleted, Converter={StaticResource ListViewItemColorConverter}}"/>
                 </Style>
             </ListView.ItemContainerStyle>
+            <ListView.Resources>
+                <DataTemplate x:Key="LevelTemplate">
+                    <TextBlock HorizontalAlignment="Center" Text="{Binding Level, Mode=OneWay}" />
+                </DataTemplate>
+                <CollectionViewSource x:Key="CountriesSource" Source="{Binding Countries, Mode=OneWay}"/>
+                <CollectionViewSource x:Key="EmptyCountriesSource" Source="{Binding EmptyCountries, Mode=OneWay}"/>
+            </ListView.Resources>
             <ListView.View>
                 <GridView>
                     <GridViewColumn DisplayMemberBinding="{Binding EventDate, Mode=OneWay, StringFormat='yyyy-MM-dd'}" Width="80">
@@ -126,6 +149,11 @@
                         </GridViewColumn.CellTemplate>
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Content="Country" Tag="CountryCode" Click="GridViewColumnHeader_Click"/>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+                    <GridViewColumn Width="60" CellTemplate="{StaticResource LevelTemplate}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Level" Tag="Level" Click="GridViewColumnHeader_Click"/>
                         </GridViewColumn.Header>
                     </GridViewColumn>
                     <GridViewColumn DisplayMemberBinding="{Binding Title, Mode=OneWay}">

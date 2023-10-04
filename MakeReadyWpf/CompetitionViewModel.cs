@@ -13,12 +13,39 @@ namespace MakeReadyWpf
 {
     public class CompetitionViewModel
     {
+        public class CompetitionLevel
+        {
+            public int? Level { get; set; }
+            public string Title { get; set; }
+
+            public CompetitionLevel(int? level, string title)
+            {
+                Level = level;
+                Title = title;
+            }
+
+            public static List<CompetitionLevel> CreateDefaultList()
+            {
+                return new List<CompetitionLevel>
+                {
+                    new CompetitionLevel(null, ""),
+                    new CompetitionLevel(1, "1"),
+                    new CompetitionLevel(2, "2"),
+                    new CompetitionLevel(3, "3"),
+                    new CompetitionLevel(4, "4"),
+                    new CompetitionLevel(5, "5"),
+                    new CompetitionLevel(0, "?")
+                };
+            }
+        }
+
         public Competition SelectedCompetition { get; set; }
         public ListCollectionView Competitions { get; set; }
         public bool ReloadData { get; set; }
 
         public List<Country> Countries { get; set; } = Country.CreateDefaultList();
         public List<Country> EmptyCountries { get; set; } = new List<Country> { new Country() { Id = 0, Code = "", Title = "" } };
+        public List<CompetitionLevel> Levels { get; set; } = CompetitionLevel.CreateDefaultList();
 
         #region Filters
 
@@ -66,6 +93,17 @@ namespace MakeReadyWpf
             }
         }
 
+        private int? _levelFilter = null;
+        public int? LevelFilter
+        {
+            get { return _levelFilter; }
+            set
+            {
+                _levelFilter = value;
+                Competitions.Refresh();
+            }
+        }
+
         #endregion
 
         public CompetitionViewModel(List<Competition> competitions)
@@ -81,6 +119,7 @@ namespace MakeReadyWpf
             bool accepted = true;
             accepted &= string.IsNullOrEmpty(CountryFilter) || competition.CountryCode.IndexOf(CountryFilter, StringComparison.OrdinalIgnoreCase) >= 0;
             accepted &= string.IsNullOrEmpty(TitleFilter) || competition.Title.IndexOf(TitleFilter, StringComparison.OrdinalIgnoreCase) >= 0;
+            accepted &= LevelFilter == null || (LevelFilter == 0 ? (competition.Level < 1 || competition.Level > 5) : competition.Level == LevelFilter);
 
             if (DateStart != null)
             {
