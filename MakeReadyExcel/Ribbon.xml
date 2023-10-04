@@ -68,8 +68,11 @@
               imageMso="ChartRadarChart"
               getEnabled="BtnChart3_Enabled"
               onAction="BtnChart3_Action"/>
-      <!--<button id="btnChart3" size="large" label="Chart #3" imageMso="ChartAreaChart"/>
-			<button id="btnChart5" size="large" label="Chart #5" imageMso="TableExcelSpreadsheetInsert"/>-->
+      <button id="btnChart4" size="large" label="Customize Chart"
+              imageMso="ChartAreaChart"
+              getEnabled="BtnChart4_Enabled"
+              onAction="BtnChart4_Action"/>
+      <!--<button id="btnChart5" size="large" label="Chart #5" imageMso="TableExcelSpreadsheetInsert"/>-->
 		</group>
 	  </tab>
     </tabs>

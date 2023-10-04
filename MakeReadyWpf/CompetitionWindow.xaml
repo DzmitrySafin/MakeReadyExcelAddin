@@ -77,31 +77,6 @@
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
-                        <!--<TextBox Width="60" Padding="4" Text="{Binding CountryFilter, UpdateSourceTrigger=PropertyChanged}" MaxLength="2" TextAlignment="Center" x:Name="TextboxCountry">
-                            <TextBox.Style>
-                                <Style TargetType="{x:Type TextBox}">
-                                    <Setter Property="CharacterCasing" Value="Upper"/>
-                                </Style>
-                            </TextBox.Style>
-                        </TextBox>
-                        <TextBlock Padding="8,4,4,4" IsHitTestVisible="False" Text="country" Foreground="DarkGray">
-                            <TextBlock.Style>
-                                <Style TargetType="{x:Type TextBlock}">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                    <Style.Triggers>
-                                        <MultiDataTrigger>
-                                            <MultiDataTrigger.Conditions>
-                                                <Condition Binding="{Binding CountryFilter}" Value=""/>
-                                                <Condition Binding="{Binding IsFocused, ElementName=TextboxCountry}" Value="False"/>
-                                            </MultiDataTrigger.Conditions>
-                                            <MultiDataTrigger.Setters>
-                                                <Setter Property="Visibility" Value="Visible"/>
-                                            </MultiDataTrigger.Setters>
-                                        </MultiDataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>-->
                     </Grid>
                     <Grid>
                         <TextBox Padding="4" Text="{Binding TitleFilter, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch" x:Name="TextboxTitle"/>

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Office = Microsoft.Office.Core;
 
@@ -288,6 +289,16 @@ namespace MakeReadyExcel
         public void BtnChart3_Action(Office.IRibbonControl control)
         {
             Globals.ThisAddIn.Chart3SingleShooter();
+        }
+
+        public bool BtnChart4_Enabled(Office.IRibbonControl control)
+        {
+            return Globals.ThisAddIn.SelectedCompetition != null;
+        }
+
+        public void BtnChart4_Action(Office.IRibbonControl control)
+        {
+            Globals.ThisAddIn.Chart4Test();
         }
 
         #endregion

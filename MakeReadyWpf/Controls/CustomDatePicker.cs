@@ -24,7 +24,7 @@ namespace MakeReadyWpf.Controls
         {
             base.OnApplyTemplate();
 
-            DatePickerTextBox box = base.GetTemplateChild("PART_TextBox") as DatePickerTextBox;
+            DatePickerTextBox box = GetTemplateChild("PART_TextBox") as DatePickerTextBox;
             box.ApplyTemplate();
 
             ContentControl watermark = box.Template.FindName("PART_Watermark", box) as ContentControl;

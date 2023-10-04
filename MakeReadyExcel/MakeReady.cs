@@ -12,6 +12,7 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using NLog;
 using System.Globalization;
+using System.Web;
 
 namespace MakeReadyExcel
 {
@@ -31,7 +32,7 @@ namespace MakeReadyExcel
         // <DIV class="auth_msg_red">[\N]Такого пользователя нет в базе данных. <P>Попробуйте авторизоваться снова.</P>[\N]</DIV>
         private static Regex loginfailRegex = new Regex(@"<DIV\s+class=""auth_msg_red"">\n(?<msg1>\w+)<P>(?<msg2>\w+)</P>\n</DIV>", RegexOptions.IgnoreCase);
         // <TR><TD NOWRAP class='tip' tt='Dva 10 paper(s), 0 popper(s), 0 plate(s), 0 disappear, 5 penalty'>Stage 2</TD><TD NOWRAP align=right id='stagemaxpts_2'>100</TD><TD NOWRAP align=right>15%</TD><TD align=right>32.69</TD><TD NOWRAP align=right>38.01</TD><TD><small>C=0.8,&nbsp;D=1.5,&nbsp;PT=3.8,&nbsp;M=5.7</small></TD></TR>
-        private static Regex stagesRegex = new Regex(@"<TR><TD\s+NOWRAP\s+class='tip'\s+tt='(?<name>[\w\s\d\(!\)]*?)\s+(?<paper>\d+)\s+paper\(s\),\s+(?<popper>\d+)\s+popper\(s\),\s+(?<plate>\d+)\s+plate\(s\),\s+(?<disappear>\d+)\s+disappear,\s+(?<penalty>\d+)\s+penalty'>Stage\s+(?<number>\d+)</TD><TD\s+NOWRAP\s+align=right\s+id='stagemaxpts_\d+'>(?<points>\d+)</TD>.+?</TR>", RegexOptions.IgnoreCase);
+        private static Regex stagesRegex = new Regex(@"<TR><TD\s+NOWRAP\s+class='tip'\s+tt='(?<name>[\w\s\d\(!/,\-\.\)]*?)\s+(?<paper>\d+)\s+paper\(s\),\s+(?<popper>\d+)\s+popper\(s\),\s+(?<plate>\d+)\s+plate\(s\),\s+(?<disappear>\d+)\s+disappear,\s+(?<penalty>\d+)\s+penalty'>Stage\s+(?<number>\d+)</TD><TD\s+NOWRAP\s+align=right\s+id='stagemaxpts_\d+'>(?<points>\d+)</TD>.+?</TR>", RegexOptions.IgnoreCase);
 
         #region Login settings
 
@@ -95,7 +96,7 @@ namespace MakeReadyExcel
                         try
                         {
                             var response = await client.SendAsync(request);
-                            if (!response.IsSuccessStatusCode) throw new Exception("Could not get proper response from MakeReady");
+                            if (!response.IsSuccessStatusCode) throw new Exception($"Could not get proper response from MakeReady (StatusCode: {response.StatusCode}, {response.ReasonPhrase})");
                             ResponseContent = await response.Content.ReadAsStringAsync();
                             logger.Debug($"[HTML PAGE CONTENT]\n{ResponseContent}\n[END OF HTML PAGE CONTENT]");
                         }
@@ -164,7 +165,7 @@ namespace MakeReadyExcel
                     try
                     {
                         var response = await client.SendAsync(request);
-                        if (!response.IsSuccessStatusCode && response.StatusCode != HttpStatusCode.Found) throw new Exception("Could not get proper response from MakeReady");
+                        if (!response.IsSuccessStatusCode && response.StatusCode != HttpStatusCode.Found) throw new Exception($"Could not get proper response from MakeReady (StatusCode: {response.StatusCode}, {response.ReasonPhrase})");
                         ResponseContent = await response.Content.ReadAsStringAsync();
                         logger.Debug($"[HTML PAGE CONTENT]\n{ResponseContent}\n[END OF HTML PAGE CONTENT]");
                     }
@@ -207,7 +208,7 @@ namespace MakeReadyExcel
                     try
                     {
                         var response = await client.SendAsync(request);
-                        if (!response.IsSuccessStatusCode) throw new Exception("Could not get proper response from MakeReady");
+                        if (!response.IsSuccessStatusCode) throw new Exception($"Could not get proper response from MakeReady (StatusCode: {response.StatusCode}, {response.ReasonPhrase})");
                         ResponseContent = await response.Content.ReadAsStringAsync();
                         logger.Debug($"[HTML PAGE CONTENT]\n{ResponseContent}\n[END OF HTML PAGE CONTENT]");
                     }
@@ -267,7 +268,7 @@ namespace MakeReadyExcel
                     try
                     {
                         var response = await client.SendAsync(request);
-                        if (!response.IsSuccessStatusCode) throw new Exception("Could not get proper response from MakeReady");
+                        if (!response.IsSuccessStatusCode) throw new Exception($"Could not get proper response from MakeReady (StatusCode: {response.StatusCode}, {response.ReasonPhrase})");
                         ResponseContent = await response.Content.ReadAsStringAsync();
                         logger.Debug($"[HTML PAGE CONTENT]\n{ResponseContent}\n[END OF HTML PAGE CONTENT]");
                     }
@@ -317,18 +318,29 @@ namespace MakeReadyExcel
             using (var client = new HttpClient(handler, true))
             {
                 client.BaseAddress = new Uri(BaseUrl);
+                string urlKey = $"/json_shooteraccuracy?m={competitionId}&s={shooterId}";
 
                 cookies.Add(client.BaseAddress, new Cookie(AccessCookieName, LoginToken));
-                using (var request = new HttpRequestMessage(HttpMethod.Get, $"/json_shooteraccuracy?m={competitionId}&s={shooterId}"))
+                using (var request = new HttpRequestMessage(HttpMethod.Get, urlKey))
                 {
                     request.Headers.UserAgent.Add(ProductInfoHeader);
 
                     try
                     {
                         var response = await client.SendAsync(request);
-                        if (!response.IsSuccessStatusCode) throw new Exception("Could not get proper response from MakeReady");
-                        ResponseContent = await response.Content.ReadAsStringAsync();
-                        logger.Debug($"[HTML PAGE CONTENT]\n{ResponseContent}\n[END OF HTML PAGE CONTENT]");
+                        if (response.IsSuccessStatusCode)
+                        {
+                            ResponseContent = await response.Content.ReadAsStringAsync();
+                            logger.Debug($"[HTML PAGE CONTENT]\n{ResponseContent}\n[END OF HTML PAGE CONTENT]");
+                        }
+                        else
+                        {
+                            if (response.StatusCode == HttpStatusCode.NotModified)
+                            {
+                                logger.Warn($"Request limit reached for match {competitionId}");
+                            }
+                            throw new Exception($"Could not get proper response from MakeReady (StatusCode: {response.StatusCode}, {response.ReasonPhrase})");
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -378,18 +390,29 @@ namespace MakeReadyExcel
             using (var client = new HttpClient(handler, true))
             {
                 client.BaseAddress = new Uri(BaseUrl);
+                string urlKey = $"/json_shooteraccuracy?m={competitionId}&s={shooterId}";
 
                 cookies.Add(client.BaseAddress, new Cookie(AccessCookieName, LoginToken));
-                using (var request = new HttpRequestMessage(HttpMethod.Get, $"/json_shooteraccuracy?m={competitionId}&s={shooterId}"))
+                using (var request = new HttpRequestMessage(HttpMethod.Get, urlKey))
                 {
                     request.Headers.UserAgent.Add(ProductInfoHeader);
 
                     try
                     {
                         var response = await client.SendAsync(request);
-                        if (!response.IsSuccessStatusCode) throw new Exception("Could not get proper response from MakeReady");
-                        ResponseContent = await response.Content.ReadAsStringAsync();
-                        logger.Debug($"[HTML PAGE CONTENT]\n{ResponseContent}\n[END OF HTML PAGE CONTENT]");
+                        if (response.IsSuccessStatusCode)
+                        {
+                            ResponseContent = await response.Content.ReadAsStringAsync();
+                            logger.Debug($"[HTML PAGE CONTENT]\n{ResponseContent}\n[END OF HTML PAGE CONTENT]");
+                        }
+                        else
+                        {
+                            if (response.StatusCode == HttpStatusCode.NotModified)
+                            {
+                                logger.Warn($"Request limit reached for match {competitionId}");
+                            }
+                            throw new Exception($"Could not get proper response from MakeReady (StatusCode: {response.StatusCode}, {response.ReasonPhrase})");
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -410,7 +433,7 @@ namespace MakeReadyExcel
                     {
                         var jToken = JArray.Parse(ResponseContent)[6]["tabledata"];
                         string tableData = jToken.ToString();
-                        var regex = new Regex($@"<TR\s+id='{shooterId}'><TD\s+NOWRAP\s+class='tip'\s+tt='(?<name>[\w\s\d\(!\)]*?)\s+(?<paper>\d+)\s+paper\(s\),\s+(?<popper>\d+)\s+popper\(s\),\s+(?<plate>\d+)\s+plate\(s\),\s+(?<disappear>\d+)\s+disappear,\s+(?<penalty>\d+)\s+penalty'>Stage\s+(?<number>\d+)</TD><TD.*?>(?<alpha>\d+)</TD><TD.*?>(?<charlie>\d+)</TD><TD.*?>(?<delta>\d+)</TD><TD.*?>(?<miss>\d+)</TD><TD.*?>(?<noshoot>\d+)</TD><TD.*?>(?<penalty>\d+)</TD><TD.*?>.*?</TD><TD.*?>\d*</TD><TD.*?>(?<time>[\d\.]+)</TD>.+?</TR>", RegexOptions.IgnoreCase);
+                        var regex = new Regex($@"<TR\s+id='{shooterId}'><TD\s+NOWRAP\s+class='tip'\s+tt='(?<name>[\w\s\d\(!/,\-\.\)]*?)\s+(?<paper>\d+)\s+paper\(s\),\s+(?<popper>\d+)\s+popper\(s\),\s+(?<plate>\d+)\s+plate\(s\),\s+(?<disappear>\d+)\s+disappear,\s+(?<penalty>\d+)\s+penalty'>Stage\s+(?<number>\d+)</TD><TD.*?>(?<alpha>\d+)</TD><TD.*?>(?<charlie>\d+)</TD><TD.*?>(?<delta>\d+)</TD><TD.*?>(?<miss>\d+)</TD><TD.*?>(?<noshoot>\d+)</TD><TD.*?>(?<penalty>\d+)</TD><TD.*?>.*?</TD><TD.*?>\d*</TD><TD.*?>(?<time>[\d\.]+)</TD>.+?</TR>", RegexOptions.IgnoreCase);
                         var matches = regex.Matches(tableData);
                         if (matches.Count == 0) throw new Exception("Could not parse shooter data from MakeReady response");
 

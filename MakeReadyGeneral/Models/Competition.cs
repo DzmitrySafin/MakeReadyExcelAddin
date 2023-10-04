@@ -48,6 +48,9 @@ namespace MakeReadyGeneral.Models
         //[XmlIgnore] // [XmlElement]
         //public Country Country { get; set; }
 
+        [XmlIgnore]
+        public bool IsSelected { get; set; }
+
         #endregion
 
         public Competition()

@@ -4,7 +4,6 @@
        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
        xmlns:local="clr-namespace:MakeReadyWpf"
-       xmlns:i1="http://schemas.microsoft.com/expression/2010/interactivity"
        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
        xmlns:converters="clr-namespace:MakeReadyWpf.Converters"
        StaysOpen="True" AllowsTransparency="True" PopupAnimation="Fade" Focusable="False"

@@ -156,6 +156,13 @@ namespace MakeReadyWpf
             SetTimer(4000);
         }
 
+        public void SetError(string header, string message)
+        {
+            if (!string.IsNullOrEmpty(header)) Header = header;
+            Message = message;
+            IsError = true;
+        }
+
         public void SetPercentage(string message, int total, int progress)
         {
             Message = message;

@@ -60,6 +60,10 @@
     <Compile Include="AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ConfigurationViewModel.cs" />
+    <Compile Include="ConfigurationWindow.xaml.cs">
+      <DependentUpon>ConfigurationWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters\ToastModeColorConverter.cs" />
     <Compile Include="Converters\ToastModeVisibilityConverter.cs" />
     <Compile Include="Helpers\StaTask.cs" />
@@ -72,6 +76,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="CompetitionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ConfigurationWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -96,7 +104,7 @@
     <Compile Include="Converters\IsNullConverter.cs" />
     <Compile Include="Converters\ListViewItemColorConverter.cs" />
     <Compile Include="Converters\NonEmptyConverter.cs" />
-    <Compile Include="Controls\CustomControl1.cs">
+    <Compile Include="Controls\MultiSelectComboBox.cs">
       <SubType>Code</SubType>
     </Compile>
     <Page Include="ToastWindow.xaml">

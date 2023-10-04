@@ -419,15 +419,10 @@ namespace MakeReadyExcel
                     var accuracy = Task.Run(async () => await StandbyConnector.LoadAccuracy(competitionId, shooter.Id, Login)).Result;
                     if (accuracy == null)
                     {
-                        if (competitionId == "1585cd3ab8b723c8b4869b02ecf38b10" && shooter.Id == 4)
-                        {
-                            accuracy = StageResult.CreateDefaultList(stagesCount);
-                        }
-                        else if (competitionId == "c040377370a7155f03e1ec131d2a4909" && (shooter.Id == 2 || shooter.Id == 5))
-                        {
-                            accuracy = StageResult.CreateDefaultList(stagesCount);
-                        }
-                        else if (competitionId == "63cd337637d35caea6c389e2bd527fe4" && (shooter.Id == 38 || shooter.Id == 15))
+                        if ((competitionId == "1585cd3ab8b723c8b4869b02ecf38b10" && shooter.Id == 4) ||
+                            (competitionId == "c040377370a7155f03e1ec131d2a4909" && (shooter.Id == 2 || shooter.Id == 5)) ||
+                            (competitionId == "63cd337637d35caea6c389e2bd527fe4" && (shooter.Id == 38 || shooter.Id == 15)) ||
+                            (competitionId == "471a35f0a510f6043f301ab8faf1f0ea" && (shooter.Id == 582 || shooter.Id == 357)))
                         {
                             accuracy = StageResult.CreateDefaultList(stagesCount);
                         }
@@ -436,7 +431,8 @@ namespace MakeReadyExcel
                             accuracy = StageResult.CreateDefaultList(stagesCount);
                             string msg = $"Could not load data for shooter {shooter.Id} ({shooter.ShortName}), match {competitionId}.";
                             logger.Warn(msg);
-                            Toast.ShowToast("Load shooters results", msg, false, false, true);
+                            //Toast.ShowToast("Load shooters results", msg, false, false, true);
+                            //Toast.SetError(null, msg);
                             //success = false;
                             //break;
                         }
@@ -1010,6 +1006,12 @@ namespace MakeReadyExcel
         }
 
         #endregion
+
+        public void Chart4Test()
+        {
+            var vm = new ConfigurationViewModel(StandbyData.Competitions.Where(c => c.IsCompleted).ToList());
+            new ConfigurationWindow(vm).ShowDialog();
+        }
 
         #region Custom XML Part
 
