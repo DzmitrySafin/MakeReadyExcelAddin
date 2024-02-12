@@ -11,8 +11,8 @@ namespace MakeReadyGeneral.Models
 {
     public class Shooter
     {
-        // {"id":7,"title":"Safin Dmitriy (Revolver/Min)","div":"5"}
-        private static Regex factorRegex = new Regex(@"(?<name>[\w\s\.]+?)\s*\((?<division>[\w\s]+)/(?<factor>\w+)\)", RegexOptions.IgnoreCase);
+        // {"id":7,"title":"Safin Dmitriy (Revolver/Min/Regular)","div":"5"}
+        private static Regex factorRegex = new Regex(@"(?<name>[\w\s\.]+?)\s*\((?<division>[\w\s]+)/(?<factor>\w+)(/(?<category>\w+))?\)", RegexOptions.IgnoreCase);
 
         #region MakeReady properties
 
@@ -72,6 +72,7 @@ namespace MakeReadyGeneral.Models
             {
                 ShortName = match.Groups["name"].Value;
                 factor = match.Groups["factor"].Value;
+                //string category = match.Groups["category"].Value;
             }
 
             if (factor.IndexOf("min", StringComparison.OrdinalIgnoreCase) >= 0) Factor = PowerFactor.Minor;

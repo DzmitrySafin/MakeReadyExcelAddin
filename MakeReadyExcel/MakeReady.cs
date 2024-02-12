@@ -12,7 +12,6 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using NLog;
 using System.Globalization;
-using System.Web;
 
 namespace MakeReadyExcel
 {
@@ -275,7 +274,7 @@ namespace MakeReadyExcel
                     }
                     catch (Exception ex)
                     {
-                        logger.Error(ex);
+                        logger.Error(ex, $"Error for match {competitionId}");
                         return null;
                     }
 
@@ -291,19 +290,19 @@ namespace MakeReadyExcel
                     try
                     {
                         var shooters = JsonConvert.DeserializeObject<List<Shooter>>(ResponseContent);
-                        if (shooters == null || shooters.Count == 0) throw new Exception($"Could not load shooters for match {competitionId}");
+                        if (shooters == null || shooters.Count == 0) throw new Exception("Could not load shooters");
                         List<Stage> stages = null;
                         foreach (var shooter in shooters.Where(s => !s.Name.StartsWith("MegaBeast")).ToList())
                         {
                             stages = await LoadStages(competitionId, shooter.Id);
                             if (stages != null && stages.Count > 0) break;
                         }
-                        if (stages == null || stages.Count == 0) throw new Exception($"Could not load stages for match {competitionId}");
+                        if (stages == null || stages.Count == 0) throw new Exception("Could not load stages");
                         return new Tuple<List<Shooter>, List<Stage>>(shooters, stages);
                     }
                     catch (Exception ex)
                     {
-                        logger.Error(ex);
+                        logger.Error(ex, $"Error for match {competitionId}");
                         return null;
                     }
                 }
@@ -338,14 +337,14 @@ namespace MakeReadyExcel
                         {
                             if (response.StatusCode == HttpStatusCode.NotModified)
                             {
-                                logger.Warn($"Request limit reached for match {competitionId}");
+                                logger.Warn("Request limit reached");
                             }
                             throw new Exception($"Could not get proper response from MakeReady (StatusCode: {response.StatusCode}, {response.ReasonPhrase})");
                         }
                     }
                     catch (Exception ex)
                     {
-                        logger.Error(ex);
+                        logger.Error(ex, $"Error for match {competitionId} shooter {shooterId}");
                         return null;
                     }
 
@@ -375,7 +374,7 @@ namespace MakeReadyExcel
                     }
                     catch (Exception ex)
                     {
-                        logger.Error(ex);
+                        logger.Error(ex, $"Error for match {competitionId} shooter {shooterId}");
                         return null;
                     }
                 }
@@ -410,14 +409,14 @@ namespace MakeReadyExcel
                         {
                             if (response.StatusCode == HttpStatusCode.NotModified)
                             {
-                                logger.Warn($"Request limit reached for match {competitionId}");
+                                logger.Warn("Request limit reached");
                             }
                             throw new Exception($"Could not get proper response from MakeReady (StatusCode: {response.StatusCode}, {response.ReasonPhrase})");
                         }
                     }
                     catch (Exception ex)
                     {
-                        logger.Error(ex);
+                        logger.Error(ex, $"Error for match {competitionId} shooter {shooterId}");
                         return null;
                     }
 
@@ -432,7 +431,9 @@ namespace MakeReadyExcel
 
                     try
                     {
-                        var jToken = JArray.Parse(ResponseContent)[6]["tabledata"];
+                        var jArray = JArray.Parse(ResponseContent);
+                        if (!jArray.HasValues || jArray.Count < 7) throw new Exception("No shooter data found in MakeReady response");
+                        var jToken = jArray[6]["tabledata"];
                         string tableData = jToken.ToString();
                         var regex = new Regex($@"<TR\s+id='{shooterId}'><TD\s+NOWRAP\s+class='tip'\s+tt='(?<name>[\w\s\d\(!/,\-\.\)]*?)\s+(?<paper>\d+)\s+paper\(s\),\s+(?<popper>\d+)\s+popper\(s\),\s+(?<plate>\d+)\s+plate\(s\),\s+(?<disappear>\d+)\s+disappear,\s+(?<penalty>\d+)\s+penalty'>Stage\s+(?<number>\d+)</TD><TD.*?>(?<alpha>\d+)</TD><TD.*?>(?<charlie>\d+)</TD><TD.*?>(?<delta>\d+)</TD><TD.*?>(?<miss>\d+)</TD><TD.*?>(?<noshoot>\d+)</TD><TD.*?>(?<penalty>\d+)</TD><TD.*?>.*?</TD><TD.*?>\d*</TD><TD.*?>(?<time>[\d\.]+)</TD>.+?</TR>", RegexOptions.IgnoreCase);
                         var matches = regex.Matches(tableData);
@@ -457,7 +458,7 @@ namespace MakeReadyExcel
                     }
                     catch (Exception ex)
                     {
-                        logger.Error(ex);
+                        logger.Error(ex, $"Error for match {competitionId} shooter {shooterId}");
                         return null;
                     }
                 }
